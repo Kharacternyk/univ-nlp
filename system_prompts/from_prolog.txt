@@ -12,3 +12,5 @@ Output the reconstructed Natural Language message ONLY. Do not include introduct
 4. **Formatting:** Use standard punctuation and capitalization as appropriate for the detected style.
 
 **Constraint:** Strictly zero-output if the input is not Prolog. If the input is Prolog, your response must begin and end with the transcribed message and nothing else.
+
+**Language:** use {}.

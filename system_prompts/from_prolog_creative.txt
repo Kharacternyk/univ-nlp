@@ -13,6 +13,8 @@ Output the reconstructed Natural Language message ONLY. Do not include introduct
 
 **Constraint:** Strictly zero-output if the input is not Prolog. If the input is Prolog, your response must begin and end with the transcribed message and nothing else.
 
+**Language:** use {}.
+
 Do no use any variables in the output.
 For example, instead of "An entity X is good if it did well" use "Everyone who did well is good". 
 

@@ -242,17 +242,20 @@ with to_prolog:
 with from_prolog:
     prolog = text_area("Input text", key="prolog", height=200)
     prompt_type = selectbox("Prompt type", ["Verbatim", "Creative"])
+    language = selectbox("Language", ["English", "Ukrainian"])
+
+    if prompt_type == "Verbatim":
+        prompt = system_prompt_from_prolog()
+    else:
+        prompt = system_prompt_from_prolog_creative()
+
+    prompt = prompt.format(language)
 
     if button("Convert", width="stretch", type="primary"):
         response = openai().chat.completions.create(
             model="gpt-5-mini",
             messages=[
-                ChatCompletionSystemMessageParam(
-                    content=system_prompt_from_prolog()
-                    if prompt_type == "Verbatim"
-                    else system_prompt_from_prolog_creative(),
-                    role="system",
-                ),
+                ChatCompletionSystemMessageParam(content=prompt, role="system"),
                 ChatCompletionUserMessageParam(content=prolog, role="user"),
             ],
         )
