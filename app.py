@@ -27,9 +27,11 @@ from streamlit import (
     text as raw,
 )
 
+# Loads environment variables such as OPENAI_API_KEY from the .env file.
 load_dotenv()
 
 
+# A client for the self-hosted LLM.
 @cache_resource
 def modal():
     return OpenAI(
@@ -57,21 +59,33 @@ def system_prompt_to_prolog():
     return read_file("system_prompts/to_prolog.txt")
 
 
+# Text, converted from Prolog with this prompt, will generally follow the
+# structure of the program. For example, each Prolog rule, fact, and query will
+# become a separate sentence. Also, placeholder variables, such as person1,
+# will be retained.
 @cache_resource
 def system_prompt_from_prolog():
     return read_file("system_prompts/from_prolog.txt")
 
 
+# A prompt for generating natural written-by-human-like texts from Prolog
+# programs.
 @cache_resource
 def system_prompt_from_prolog_creative():
     return read_file("system_prompts/from_prolog_creative.txt")
 
 
+# A prompt for fixing Prolog interpreter warnings and errors.
 @cache_resource
 def system_prompt_autocorrect():
     return read_file("system_prompts/autocorrect.txt")
 
 
+# BNF grammars for restricted sampling.
+# - space_after_comma_no_comments.txt:
+#   enforces valid Prolog (YAP syntax) with spaces after commas and no comments
+# - space_after_comma_no_comments_two_blocks.txt:
+#   additionally enforces that all rules and facts come before all queries.
 @cache_resource
 def grammars():
     grammars: list[tuple[str, str | None]] = [("None", None)]
@@ -82,6 +96,7 @@ def grammars():
     return grammars
 
 
+# Example texts for converting to Prolog.
 @cache_resource
 def examples():
     examples = []
@@ -92,6 +107,8 @@ def examples():
     return examples
 
 
+# Assuming that queries follow all facts and rules, splits a Prolog program
+# into the two blocks.
 def split_prolog(prolog):
     try:
         first_query_index = prolog.index("?-")
@@ -104,6 +121,8 @@ def split_prolog(prolog):
     return rules, queries
 
 
+# Run Prolog through SWI interpreter and display output.
+# Returns all errors and warnings.
 def render_prolog_output(rules, queries):
     all_stderr = ""
 
@@ -139,6 +158,7 @@ def render_prolog_output(rules, queries):
 
 to_prolog, from_prolog = tabs(["To Prolog", "From Prolog"])
 
+# Converting to Prolog user interface section (tab).
 with to_prolog:
     default_input = str(examples()[0])
     text = text_area("Input text", key="text", height=200)
@@ -160,6 +180,8 @@ with to_prolog:
     else:
         extra_body = dict()
 
+    # High reasoning effort generally takes a very long time to complete, so
+    # it's not among the available options.
     reasoning_effort = selectbox("Reasoning effort", ["Low", "Medium"], index=1).lower()
 
     temperature = slider(
@@ -177,6 +199,7 @@ with to_prolog:
     with right:
         do_convert = button("Convert", width="stretch")
 
+    # If any of the three conversion buttons is pressed
     if do_run or do_autocorrect or do_convert:
         response = modal().chat.completions.create(
             model="",
@@ -200,14 +223,18 @@ with to_prolog:
         assert prolog
 
         if do_convert:
+            # The "Convert" button just displays the generated Prolog program.
             code(prolog, language="prolog")
         else:
+            # The "Convert & Run" buttons run the program.
             rules, queries = split_prolog(prolog)
 
             code(rules, language="prolog")
 
             all_stderr = render_prolog_output(rules, queries)
 
+            # The "Convert & Run & Autocorrect" button tries to regenerate the
+            # program to fix interpreter warnings and errors.
             if all_stderr and do_autocorrect:
                 system_prompt = system_prompt_autocorrect().format(
                     system_prompt_to_prolog(),
@@ -239,6 +266,7 @@ with to_prolog:
                 render_prolog_output(rules, queries)
 
 
+# Converting from Prolog user interface section (tab).
 with from_prolog:
     prolog = text_area("Input text", key="prolog", height=200)
     prompt_type = selectbox("Prompt type", ["Verbatim", "Creative"])
@@ -252,6 +280,7 @@ with from_prolog:
     prompt = prompt.format(language)
 
     if button("Convert", width="stretch", type="primary"):
+        # GPT-5-mini does not support reasoning and temperatures other than 1.
         response = openai().chat.completions.create(
             model="gpt-5-mini",
             messages=[
