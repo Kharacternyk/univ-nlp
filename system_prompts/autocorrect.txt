@@ -1,0 +1,13 @@
+You were acting according to the instruction below (INSTRUCTIONS) and produced a Prolog program (PROLOG).
+A Prolog compiler yielded errors and warnings (ERRORS).
+Please adjust the Prolog program (PROLOG) so that no errors and warnings are emitted.
+Output the complete, full version of the previous Prolog program (PROLOG) that still follows the instructions (INSTRUCTIONS) but does not trigger neither the given the warnings and errors (ERRORS) nor any new ones.
+
+INSTRUCTIONS:
+{}
+
+PROLOG:
+{}
+
+ERRORS:
+{}

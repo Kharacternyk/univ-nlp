@@ -1,0 +1,179 @@
+start: sentence*
+
+sentence: clause "."
+        | directive "."
+        | query "."
+
+clause: head_term ":-" body                         -> rule
+      | head_term "-->" dcg_body                    -> dcg_rule
+      | head_term                                   -> fact
+
+head_term: module_qualifier ":" callable_term       -> module_head
+         | callable_term
+
+callable_term: atom "(" arglist ")"                 -> compound
+             | atom                                 -> atom_term
+
+directive: ":-" body                                -> directive
+         | ":-" module_decl                         -> module_directive
+
+query: "?-" body                                    -> query
+
+module_decl: "module" "(" body ", " body ")"
+
+?body: prefix_1150
+
+?prefix_1150: prefix_op_1150 if_then_else            -> prefix_directive
+            | if_then_else
+
+prefix_op_1150: "dynamic" | "discontiguous" | "module_transparent"
+              | "meta_predicate" | "multifile" | "ensure_loaded"
+              | "volatile" | "use_module" | "reexport"
+              | "mode" | "public" | "thread_local"
+
+?if_then_else: if_then ";" if_then_else             -> disjunction
+             | if_then "->" if_then_else            -> if_then_else_full
+             | if_then
+
+?if_then: conjunction "->" if_then                  -> if_then_op
+        | conjunction
+
+?conjunction: not_provable ", " conjunction           -> conjunction
+            | not_provable
+
+?not_provable: "\\+" not_provable                   -> not_provable
+             | comparison
+
+?comparison: arith_expr comp_op arith_expr          -> comparison
+           | arith_expr "is" arith_expr             -> is_expr
+           | arith_expr
+
+comp_op: "=:=" | "=\\=" | "<" | ">" | ">=" | "=<"
+       | "=" | "\\=" | "==" | "\\==" | "@<" | "@>" | "@>=" | "@=<"
+       | "=.."
+       | "\\+"
+       | "in" | "ins"
+       | "#=" | "#\\=" | "#<" | "#>" | "#>=" | "#=<"
+       | "#<=>" | "#==>" | "#\\/" | "#/\\"
+
+?arith_expr: arith_add COLON arith_expr              -> module_call
+           | arith_add
+
+COLON: ":"
+
+?arith_add: arith_add "+" arith_mul                 -> add
+          | arith_add "-" arith_mul                  -> sub
+          | arith_add "/\\" arith_mul                -> bitand
+          | arith_add "\\/" arith_mul                -> bitor
+          | arith_add "xor" arith_mul                -> xor
+          | arith_add ".." arith_mul                  -> range
+          | arith_mul
+
+?arith_mul: arith_mul "*" arith_pow                  -> mul
+          | arith_mul "/" arith_pow                   -> div
+          | arith_mul "//" arith_pow                  -> intdiv
+          | arith_mul "rem" arith_pow                 -> rem
+          | arith_mul "mod" arith_pow                 -> mod
+          | arith_mul ">>" arith_pow                  -> rshift
+          | arith_mul "<<" arith_pow                  -> lshift
+          | arith_mul "rdiv" arith_pow                -> rdiv
+          | arith_pow
+
+?arith_pow: arith_unary "**" arith_unary             -> power
+          | arith_unary "^" arith_unary              -> caret
+          | arith_unary
+
+?arith_unary: "-" arith_unary                        -> neg
+            | "+" arith_unary                         -> pos
+            | "\\" arith_unary                        -> bitneg
+            | primary
+
+?primary: atom "(" arglist ")"                       -> compound
+        | atom                                       -> atom_term
+        | variable                                   -> var
+        | number                                     -> number_term
+        | string_term
+        | list
+        | curly_term
+        | paren_term
+        | "!" -> cut
+
+paren_term: "(" body ")"
+
+curly_term: "{" "}"                                  -> empty_curly
+          | "{" body "}"                              -> curly
+
+list: "[" "]"                                        -> empty_list
+    | "[" list_items "]"                              -> list
+    | "[" list_items "|" body "]"                     -> list_head_tail
+
+list_items: body (", " body)*
+
+?dcg_body: dcg_or
+
+?dcg_or: dcg_seq ";" dcg_or                         -> dcg_disjunction
+       | dcg_seq
+
+?dcg_seq: dcg_primary ", " dcg_seq                    -> dcg_sequence
+        | dcg_primary
+
+?dcg_primary: atom "(" arglist ")"                   -> dcg_nonterminal_args
+            | atom                                   -> dcg_nonterminal
+            | list                                   -> dcg_terminals
+            | "!" -> dcg_cut
+            | "{" body "}"                            -> dcg_pushback_or_goal
+            | "(" dcg_body ")"                        -> dcg_paren
+            | "\\+" dcg_primary                       -> dcg_not
+
+arglist: body (", " body)*
+
+atom: ATOM
+    | QUOTED_ATOM
+    | GRAPHIC_TOKEN
+    | GRAPHIC_SINGLE
+    | SEMICOLON_ATOM
+    | CUT_AS_ATOM
+    | SOLO_ATOM
+
+SEMICOLON_ATOM: ";"
+CUT_AS_ATOM: "!"
+GRAPHIC_SINGLE: /[#&*\/<=>?@\\^~$]/
+
+ATOM: /[a-z][a-zA-Z0-9_]*/
+QUOTED_ATOM: "'" /([^'\\]|\\.|\'{2})*/ "'"
+GRAPHIC_TOKEN: /[#&*+\-.\/:<=>?@\\^~$][#&*+\-.\/:<=>?@\\^~$]+/
+SOLO_ATOM: /[{}]/
+
+variable: NAMED_VAR
+        | ANON_VAR
+
+NAMED_VAR: /[A-Z_][a-zA-Z0-9_]*/
+ANON_VAR: "_"
+
+number: FLOAT
+      | CHAR_CODE_ESC | CHAR_CODE_HEX | CHAR_CODE_LIT
+      | HEX_INTEGER | OCT_INTEGER | BIN_INTEGER
+      | DEC_INTEGER
+
+CHAR_CODE_ESC: /0'\\[abcefnrstv\\'"`]/
+CHAR_CODE_HEX: /0'\\x[0-9a-fA-F]+\\/
+CHAR_CODE_LIT: /0'[^ \t\n\r\\]/
+HEX_INTEGER: /0[xX][0-9a-fA-F][0-9a-fA-F_]*/
+OCT_INTEGER: /0[oO][0-7][0-7_]*/
+BIN_INTEGER: /0[bB][01][01_]*/
+DEC_INTEGER: /[0-9][0-9_]*/
+
+FLOAT: /[0-9][0-9_]*\.[0-9][0-9_]*([eE][+-]?[0-9]+)?/
+     | /[0-9][0-9_]*[eE][+-]?[0-9]+/
+
+string_term: DQ_STRING                               -> string
+           | BQ_STRING                                -> backquoted_string
+
+DQ_STRING: /\"([^\"\\]|\\.)*\"/
+BQ_STRING: /`([^`\\]|\\.)*`/
+
+module_qualifier: atom
+                | variable
+
+%import common.WS
+%ignore WS
