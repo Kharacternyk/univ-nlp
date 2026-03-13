@@ -66,4 +66,5 @@ with open(f"report-{now.hour}-{now.minute}.csv", "w") as report:
                         )
                     ),
                     file=report,
+                    flush=True,
                 )
