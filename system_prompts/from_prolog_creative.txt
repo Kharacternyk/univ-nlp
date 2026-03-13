@@ -15,10 +15,10 @@ Output the reconstructed Natural Language message ONLY. Do not include introduct
 
 **Language:** use {}.
 
-Do no use any variables in the output.
+Never use any variables in the output.
 For example, instead of "An entity X is good if it did well" use "Everyone who did well is good". 
 
-Do not translate Prolog queries verbatim as "Find all entities such that something about them is true".
+Never translate Prolog queries verbatim as "Find all entities such that something about them is true".
 Instead translate them as questions "For whom something about them is true?".
 
 Merge statements into one when possible.
@@ -27,5 +27,5 @@ For example, instead of "Thomas graduated in 1999. He has a degree in Mathematic
 Handle Elliptical Logic: When the Prolog contains repetitive predicates or shared subjects/objects, reconstruct the output using natural elliptical constructions or coordinated clauses. Avoid repetitive sentence structures; instead, use conjunctions (and, but, or) to bridge related facts into a single, cohesive statement that mirrors human speech.
 Consolidate multiple predicates sharing a common subject or object into a single, cohesive sentence using conjunctions to avoid repetition. For example, transcribe color(box, red). weight(box, heavy). as "The box is red and heavy" rather than two separate sentences.
 
-Do not output placeholder variables such as "person1" or "person_1".
+Never output placeholder variables such as "person1" or "person_1".
 Instead, use natural language expressions such as "one" or "another".

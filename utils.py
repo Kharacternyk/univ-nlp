@@ -18,23 +18,29 @@ def split_prolog(prolog: str):
 
 
 # Run Prolog through SWI interpreter.
-# Returns combined stderr.
-def run_prolog(rules: str, queries: str, display: Callable[[str], None]) -> str:
+# Returns combined stdout and stderr.
+def run_prolog(
+    rules: str, queries: str, display: Callable[[str], None]
+) -> tuple[str, str]:
+    all_stdout = ""
     all_stderr = ""
 
     with NamedTemporaryFile("w") as file:
         file.write(rules)
         file.flush()
 
-        for query in queries.splitlines():
-            display(query)
+        for query in queries.split("?-"):
+            if not query.strip():
+                continue
+
+            display("?-" + query)
 
             arguments = [
                 "swipl",
                 "-s",
                 file.name,
                 "-g",
-                query.removeprefix("?-"),
+                query,
                 "-t",
                 "halt",
             ]
@@ -45,8 +51,9 @@ def run_prolog(rules: str, queries: str, display: Callable[[str], None]) -> str:
 
             if stdout:
                 display(stdout)
+                all_stdout += stdout
             if stderr:
                 display(stderr)
                 all_stderr += stderr
 
-    return all_stderr
+    return all_stdout, all_stderr

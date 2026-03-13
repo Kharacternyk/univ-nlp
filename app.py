@@ -51,7 +51,7 @@ llm_from_prolog = get_llm_from_prolog()
 # Run Prolog through SWI interpreter and display output.
 # Returns all errors and warnings.
 def render_prolog_output(rules: str, queries: str) -> str:
-    return run_prolog(rules, queries, lambda query: code(query, language="prolog"))
+    return run_prolog(rules, queries, lambda query: code(query, language="prolog"))[1]
 
 
 to_prolog, from_prolog = tabs(["To Prolog", "From Prolog"])

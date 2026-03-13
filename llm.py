@@ -20,7 +20,7 @@ class LLM:
         self._model = model
 
     def convert_to_prolog(
-        self, text: str, temperature: float, effort: Effort, grammar: str | None
+        self, text: str, temperature: float, effort: Effort, grammar: str | None = None
     ) -> ChatCompletionMessage:
         return self._make_request(
             [
