@@ -19,7 +19,7 @@ llms = {
 
 now = datetime.now()
 
-with open(f"report-{now.hour}-{now.minute}.csv", "w") as report:
+with open(f"report-{now.hour}-{now.minute:02}.csv", "w") as report:
     for case_index, test_case in enumerate(sorted(Path("./eval").iterdir())):
         text = (test_case / "input.txt").read_text()
         output = (test_case / "output.txt").read_text()

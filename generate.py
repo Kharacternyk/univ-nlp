@@ -10,7 +10,7 @@ from resources import Prompts
 load_dotenv()
 
 now = datetime.now()
-output_directory = Path("generated") / f"{now.hour}-{now.minute}"
+output_directory = Path("generated") / f"{now.hour}-{now.minute:02}"
 output_directory.mkdir(parents=True)
 
 input_file = Path("input.txt")
