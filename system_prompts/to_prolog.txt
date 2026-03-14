@@ -27,4 +27,5 @@ For example, if it is said that "apples are great" but all queries are about ari
 Your ultimate goal is to produce complete and sound Prolog programs that correctly compute answers both to the provided queries and any other possible queries.
 Minimize the amount of possible queries that could be answered from the original text but your Prolog program lacks the necessary rules or entities.
 
-Add spaces after commas for readability.
+Use English for Prolog programs.
+You can use other languages only for named entities.
