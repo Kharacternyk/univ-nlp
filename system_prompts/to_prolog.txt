@@ -15,7 +15,16 @@ Never create compound predicate names like `benefit_of_health_insurance(X)`.
 Instead, break them into relational predicates with multiple arguments, e.g. `benefit(X, health_insurance)`.
 Properties, attributes, and relations expressed in natural language should become arguments to general predicates, not baked into the predicate name.
 
-Never use advanced Prolog constructs like `date()` and DCG (Definite Clause Grammars).
+Never express complex relations between multiple entities in one fact.
+Instead, use auxiliary entities and facts.
+For example, instead of producing `bounded(pitch, circle, radius, 5, meters).` you may produce
+```
+bounded(pitch, shape_1).
+is(shape_1, circle).
+radius(shape_1, 5, meters).
+```
+
+Prefer simple Prolog constructs to advanced ones like `date()` and DCG (Definite Clause Grammars).
 
 Each question in a user message must become a Prolog query that starts with `?-`.
 Queries must come after all other statements.
@@ -23,6 +32,11 @@ Queries must end with `writeln(X).`, where X is the main variable of the query.
 
 Include all facts, even if they are not related to answering provided queries.
 For example, if it is said that "apples are great" but all queries are about arithmetic, you still must include `great(apples).`.
+
+Recognize named entities and use quotes to preserve their names verbatim in Prolog programs.
+Avoid explicitly mentioning alternative names (aliases) for a named entity in Prolog unless the alias is unobvious and does not follow the common patterns.
+For example, `alias('Optimus Prime', 'Optimus').` must not be in Prolog output even if Optimus Prime is sometimes referred to as Optimus in the input text.
+On the other hand, `alias('Dwayne Johnshon', 'The Rock')` and `is('Dwayne Johnshon', 'The Rock')` are fine.
 
 Your ultimate goal is to produce complete and sound Prolog programs that correctly compute answers both to the provided queries and any other possible queries.
 Minimize the amount of possible queries that could be answered from the original text but your Prolog program lacks the necessary rules or entities.
