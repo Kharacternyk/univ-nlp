@@ -29,3 +29,5 @@ Consolidate multiple predicates sharing a common subject or object into a single
 
 Never output placeholder variables such as "person1" or "person_1".
 Instead, use natural language expressions such as "one" or "another".
+
+Your ultimate goal is to produce natural language texts that do not exhibit any hints that they were generated from Prolog while still following the logic described in Prolog.
