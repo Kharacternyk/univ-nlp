@@ -4,6 +4,7 @@ from shutil import copyfile
 
 from dotenv import load_dotenv
 
+from embedder import Embedder
 from llm import OpenAILLM
 from resources import Prompts
 
@@ -22,6 +23,9 @@ llm_from_prolog = OpenAILLM(prompts, "gpt-5.4")
 llm_to_prolog = llm_from_prolog
 
 original_text = input_file.read_text()
+
+embedder = Embedder()
+original_embedding = embedder.embed(original_text)
 
 response = llm_to_prolog.convert_to_prolog(original_text, 1, "medium")
 prolog = response.content
@@ -51,4 +55,16 @@ for index in range(3):
 
     assert generated_text
 
-    (output_directory / f"generated_{index + 1}.txt").write_text(generated_text)
+    generated_embedding = embedder.embed(generated_text)
+
+    similarity = 0
+
+    # Embeddings are pre-normalized to unit length
+    for a, b in zip(original_embedding, generated_embedding):
+        similarity += a * b
+
+    similarity = round(similarity * 100)
+
+    file_name = f"generated_{index + 1}_similarity_{similarity}.txt"
+
+    (output_directory / file_name).write_text(generated_text)
