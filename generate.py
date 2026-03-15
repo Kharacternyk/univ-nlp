@@ -1,4 +1,5 @@
 from datetime import datetime
+from os import environ
 from pathlib import Path
 from shutil import copyfile
 
@@ -27,7 +28,9 @@ original_text = input_file.read_text()
 embedder = Embedder()
 original_embedding = embedder.embed(original_text)
 
-response = llm_to_prolog.convert_to_prolog(original_text, 1, "medium")
+effort = environ.get("EFFORT", "medium")
+
+response = llm_to_prolog.convert_to_prolog(original_text, 1, effort)
 prolog = response.content
 
 assert prolog
@@ -49,7 +52,7 @@ for line in prolog.splitlines():
 
 for index in range(3):
     response = llm_from_prolog.convert_from_prolog(
-        stripped_prolog, 1, "medium", "Ukrainian", True
+        stripped_prolog, 1, effort, "Ukrainian", True
     )
     generated_text = response.content
 
