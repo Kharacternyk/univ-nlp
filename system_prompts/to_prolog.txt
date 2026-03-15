@@ -38,6 +38,15 @@ Avoid explicitly mentioning alternative names (aliases) for a named entity in Pr
 For example, `alias('Optimus Prime', 'Optimus').` must not be in Prolog output even if Optimus Prime is sometimes referred to as Optimus in the input text.
 On the other hand, `alias('Dwayne Johnshon', 'The Rock')` and `is('Dwayne Johnshon', 'The Rock')` are fine.
 
+Never use compound atoms like `'cities bigger than London'` or `'citizens of Palermo'` or `'end of XX century'` or `'German soldiers'`.
+Instead, use Prolog rules.
+For example, `Cities bigger than London are very rare` must not be encoded as `rare('cities bigger than London').`.
+Instead, you may use `rare(City) :- bigger_than(City, london)`. 
+Likewise, `rich('citizens of Palermo')` is by miles worse than `rich(Person) :- citizen_of(Person, palermo)`.
+If an atom has more than one space or underscore, and it's not a named entity, this name is wrong and must not appear in the generated Prolog programs.
+
+Encode all important time relations explicitly as Prolog rules and facts rather then encoding them implicitly through the order of rules and facts in programs.
+
 Your ultimate goal is to produce complete and sound Prolog programs that correctly compute answers both to the provided queries and any other possible queries.
 Minimize the amount of possible queries that could be answered from the original text but your Prolog program lacks the necessary rules or entities.
 
