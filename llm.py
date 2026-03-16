@@ -1,7 +1,7 @@
 from os import environ
 from typing import Literal
 
-from openai import OpenAI
+from openai import OpenAI, omit
 from openai.types.chat import (
     ChatCompletionMessage,
     ChatCompletionSystemMessageParam,
@@ -96,7 +96,7 @@ class LLM:
             model=self._model,
             messages=messages,
             temperature=temperature,
-            reasoning_effort=effort,
+            reasoning_effort=effort or omit,
             extra_body=extra_body,
         )
 
