@@ -21,6 +21,7 @@ copyfile(input_file, output_directory / "input.txt")
 
 prompts = Prompts()
 
+# Change models as needed
 llm_from_prolog = OpenAILLM(prompts, "gpt-5.4")
 llm_to_prolog = llm_from_prolog
 

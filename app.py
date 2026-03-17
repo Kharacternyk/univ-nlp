@@ -33,6 +33,7 @@ resources = cache_resource(Resources)()
 # LLM for converting to Prolog.
 @cache_resource
 def get_llm_to_prolog() -> LLM:
+    # Change models as needed
     return ModalLLM(resources.prompts)
 
 
@@ -42,6 +43,7 @@ llm_to_prolog = get_llm_to_prolog()
 # LLM for converting from Prolog.
 @cache_resource
 def get_llm_from_prolog() -> LLM:
+    # Change models as needed
     return OpenAILLM(resources.prompts, "gpt-5-mini")
 
 
