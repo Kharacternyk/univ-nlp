@@ -64,7 +64,7 @@ class LLM:
         stderr: str,
         temperature: float,
         effort: Effort,
-        grammar: str | None,
+        grammar: str | None = None,
     ) -> ChatCompletionMessage:
         prompt = self._prompts.autocorrect.format(
             self._prompts.to_prolog,

@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from embedder import Embedder
 from llm import OpenAILLM
 from resources import Prompts
+from utils import run_prolog, split_prolog
 
 load_dotenv()
 
@@ -34,7 +35,20 @@ response = llm_to_prolog.convert_to_prolog(original_text, 1, effort)
 prolog = response.content
 
 assert prolog
+
 (output_directory / "program.pro").write_text(prolog)
+
+rules, queries = split_prolog(prolog)
+
+stderr = run_prolog(rules, queries or "?- true.")[1]
+
+if stderr:
+    response = llm_to_prolog.autocorrect(prolog, stderr, 1, effort)
+    prolog = response.content
+
+    assert prolog
+
+    (output_directory / "autocorrected.pro").write_text(prolog)
 
 stripped_prolog = ""
 

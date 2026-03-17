@@ -20,7 +20,7 @@ def split_prolog(prolog: str):
 # Run Prolog through SWI interpreter.
 # Returns combined stdout and stderr.
 def run_prolog(
-    rules: str, queries: str, display: Callable[[str], None]
+    rules: str, queries: str, display: Callable[[str], None] = lambda _: None
 ) -> tuple[str, str]:
     all_stdout = ""
     all_stderr = ""
